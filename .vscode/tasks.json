@@ -1,0 +1,91 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": [
+                "rm -rf ${workspaceFolder}/build/src/${input:exe};",
+                "rm -rf ${workspaceFolder}/buildfuzz/src/${input:exe}"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "EXPORTCOMPILECMDS": "-DCMAKE_EXPORT_COMPILE_COMMANDS=1"
+                },
+                
+            },
+            "command": [
+                "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build ${EXPORTCOMPILECMDS} &&",
+                "cmake --build ${workspaceFolder}/build"
+            ],
+            "problemMatcher": [],
+            
+        },
+        {
+            "label": "Build Fuzz",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "EXPORTCOMPILECMDS": "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
+                    "BUILDDIR": "${workspaceFolder}/buildfuzz"
+                }
+            },
+            "command": [
+                "cmake ",
+                "-S ${workspaceFolder} ",
+                "-B ${BUILDDIR} ",
+                "${EXPORTCOMPILECMDS} ", 
+                "-DDOFUZZ=1 ",
+                "-DCMAKE_C_COMPILER=afl-clang-fast ",
+                "-DCMAKE_CXX_COMPILER=afl-clang-fast++ &&",
+                "cmake --build ${workspaceFolder}/buildfuzz "
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Fuzz",
+            "type": "shell",
+            "options": {
+                "env": {
+                    
+                    "WORKDIR": "/workspaces/ManagedCppSTLContainers/src/${input:exe}/fuzz",
+                    "BUILDDIR": "${workspaceFolder}/buildfuzz"
+                }
+            },
+            "command": [
+                "afl-fuzz -i ${WORKDIR}/in -o ${WORKDIR}/out -- ${BUILDDIR}/src/${input:exe}/${input:exe} "
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run",
+            "type": "shell",
+            "command": [
+                "${workspaceFolder}/build/src/${input:exe}/${input:exe} &&",
+                "lcov -q --capture --directory . --output-file coverage.info &&",
+                "genhtml -q coverage.info --output-directory ${workspaceFolder}/build/src/${input:exe}/coverage"
+            ],
+            "problemMatcher": []
+        }
+    ],
+    
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "exe",
+            "description": "Pick executable",
+            "options": [
+                "VectorOfVectors",
+                "EncapsulatedEnums"
+            ]
+        }
+    ]
+    
+}
