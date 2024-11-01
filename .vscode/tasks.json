@@ -73,6 +73,19 @@
                 "genhtml -q coverage.info --output-directory ${workspaceFolder}/build/src/${input:exe}/coverage"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Run GTests",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "ASAN_OPTIONS": "abort_on_error=1:report_objects=1"
+                }
+            },
+            "command": [
+                "${workspaceFolder}/build/src/${input:exe}/test/${input:exe}_test",
+            ],
+            "problemMatcher": []
         }
     ],
     

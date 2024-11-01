@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/VectorOfVectors.dir/main.cpp.o CMakeFiles/VectorOfVectors.dir/VectorOfVectors.cpp.o -o VectorOfVectors 
