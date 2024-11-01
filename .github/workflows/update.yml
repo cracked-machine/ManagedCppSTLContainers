@@ -33,6 +33,6 @@ jobs:
           git config --global user.name "cracked-machine"
           git add TOC.md
           git commit -m "Updating readme with directory listings"
-          git fetch origin master
-          git push origin HEAD:master
+          git fetch origin main
+          git push origin HEAD:main
           
